@@ -9,7 +9,7 @@ import { db, schema } from "@/db";
 import { applyPolarEvent } from "@/lib/billing/apply-event";
 import { checkoutProducts } from "@/lib/billing/catalog";
 import { getEntitlement } from "@/lib/billing/entitlements";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, sendInvitation } from "@/lib/email";
 import { appUrl, billingEnabled, getEnv, googleEnabled } from "@/lib/env";
 import { site } from "@/config/site";
 
@@ -71,7 +71,7 @@ export const auth = betterAuth({
       membershipLimit: async (_user, org) => (await getEntitlement(db, org.id)).plan.limits.seats,
       async sendInvitationEmail(data) {
         const link = `${baseURL}/accept-invitation/${data.id}`;
-        await sendEmail({
+        await sendInvitation({
           to: data.email,
           subject: `${data.inviter.user.name} invited you to ${data.organization.name}`,
           text: `${data.inviter.user.name} invited you to join ${data.organization.name} on ${site.name}.\nAccept: ${link}`,

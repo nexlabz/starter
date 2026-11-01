@@ -1,4 +1,4 @@
-import { getEnv } from "./env";
+import { emailEnabled, getEnv } from "./env";
 
 export type Email = { to: string; subject: string; text: string; html?: string };
 
@@ -21,4 +21,13 @@ export async function sendEmail(mail: Email): Promise<void> {
     body: JSON.stringify({ from: env.EMAIL_FROM, to: mail.to, subject: mail.subject, text: mail.text, html: mail.html }),
   });
   if (!res.ok) throw new Error(`Resend error ${res.status}: ${await res.text()}`);
+}
+
+/**
+ * An invitation stays valid without email: admins can copy its link from the Team
+ * page. So a missing provider skips delivery here instead of failing the invite.
+ */
+export async function sendInvitation(mail: Email): Promise<void> {
+  if (!emailEnabled() && getEnv().NODE_ENV === "production") return;
+  await sendEmail(mail);
 }
