@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { and, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { CancelInvitationButton, InviteForm, RemoveMemberButton } from "@/components/team-actions";
+import { CancelInvitationButton, CopyInviteLinkButton, InviteForm, RemoveMemberButton } from "@/components/team-actions";
 import { getEntitlement } from "@/lib/billing/entitlements";
+import { appUrl, emailEnabled } from "@/lib/env";
 import { isAdminRole, requireOrgSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Team" };
@@ -26,7 +27,7 @@ export default async function TeamPage() {
         <h1 className="text-2xl font-bold">Team</h1>
         <p className="text-sm text-muted">{members.length} of {ent.plan.limits.seats} seats used on the {ent.plan.name} plan.</p>
       </div>
-      {admin && <InviteForm />}
+      {admin && <InviteForm emailOn={emailEnabled()} />}
       <section aria-labelledby="members">
         <h2 id="members" className="mb-2 font-semibold">Members</h2>
         <ul className="divide-y divide-border rounded-xl border border-border">
@@ -45,7 +46,12 @@ export default async function TeamPage() {
             {invites.map((i) => (
               <li key={i.id} className="flex items-center justify-between p-4">
                 <span className="text-sm">{i.email} · {i.role}</span>
-                {admin && <CancelInvitationButton id={i.id} />}
+                {admin && (
+                  <span className="flex gap-2">
+                    <CopyInviteLinkButton link={`${appUrl()}/accept-invitation/${i.id}`} />
+                    <CancelInvitationButton id={i.id} />
+                  </span>
+                )}
               </li>
             ))}
           </ul>

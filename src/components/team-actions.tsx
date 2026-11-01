@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
-export function InviteForm() {
+export function InviteForm({ emailOn }: { emailOn: boolean }) {
   const router = useRouter();
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -17,7 +17,7 @@ export function InviteForm() {
         const f = new FormData(e.currentTarget);
         const res = await authClient.organization.inviteMember({ email: String(f.get("email")), role: String(f.get("role")) as "member" | "admin" });
         setBusy(false);
-        setMsg(res.error ? { ok: false, text: res.error.message ?? "Could not invite" } : { ok: true, text: "Invitation sent." });
+        setMsg(res.error ? { ok: false, text: res.error.message ?? "Could not invite" } : { ok: true, text: emailOn ? "Invitation sent." : "Invitation created. Copy its link below and send it yourself." });
         if (!res.error) { (e.target as HTMLFormElement).reset(); router.refresh(); }
       }}
     >
@@ -34,6 +34,21 @@ export function RemoveMemberButton({ memberId }: { memberId: string }) {
   return (
     <button className="btn" onClick={async () => { await authClient.organization.removeMember({ memberIdOrEmail: memberId }); router.refresh(); }}>
       Remove
+    </button>
+  );
+}
+
+export function CopyInviteLinkButton({ link }: { link: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      className="btn"
+      onClick={async () => {
+        await navigator.clipboard.writeText(link);
+        setCopied(true);
+      }}
+    >
+      {copied ? "Copied" : "Copy link"}
     </button>
   );
 }

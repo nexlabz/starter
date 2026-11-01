@@ -64,3 +64,5 @@ export function appUrl(): string {
   if (vercel) return `https://${vercel}`;
   return "http://localhost:3000";
 }
+
+export const emailEnabled = () => Boolean(getEnv().RESEND_API_KEY);
