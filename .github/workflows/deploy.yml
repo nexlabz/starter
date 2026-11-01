@@ -26,18 +26,7 @@ jobs:
           fi
       - if: steps.gate.outputs.ready == 'true'
         uses: actions/checkout@v4
+      # Builds on Vercel, not here: `vercel pull` returns Sensitive env vars blank,
+      # so a local `vercel build` fails env validation.
       - if: steps.gate.outputs.ready == 'true'
-        uses: pnpm/action-setup@v4
-      - if: steps.gate.outputs.ready == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - if: steps.gate.outputs.ready == 'true'
-        run: pnpm install --frozen-lockfile
-      - if: steps.gate.outputs.ready == 'true'
-        run: pnpm dlx vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
-      - if: steps.gate.outputs.ready == 'true'
-        run: pnpm dlx vercel@latest build --prod --token="$VERCEL_TOKEN"
-      - if: steps.gate.outputs.ready == 'true'
-        run: pnpm dlx vercel@latest deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+        run: npx --yes vercel@latest deploy --prod --yes --token="$VERCEL_TOKEN" --env COMMIT_SHA="$GITHUB_SHA"
