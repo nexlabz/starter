@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, count, eq, gt, inArray, isNull } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import * as schema from "@/db/schema";
@@ -41,4 +41,23 @@ export async function getEntitlement(db: AnyDb, orgId: string): Promise<Entitlem
     }
   }
   return best;
+}
+
+/** Seats in use: members plus invitations still open to be accepted. */
+export async function seatsTaken(db: AnyDb, orgId: string): Promise<number> {
+  const d = db as NodePgDatabase<typeof schema>;
+  const [[members], [invites]] = await Promise.all([
+    d.select({ n: count() }).from(schema.member).where(eq(schema.member.organizationId, orgId)),
+    d
+      .select({ n: count() })
+      .from(schema.invitation)
+      .where(
+        and(
+          eq(schema.invitation.organizationId, orgId),
+          eq(schema.invitation.status, "pending"),
+          gt(schema.invitation.expiresAt, new Date()),
+        ),
+      ),
+  ]);
+  return members.n + invites.n;
 }

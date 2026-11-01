@@ -25,7 +25,11 @@ export function OnboardingForm() {
       setBusy(false);
       return setError(res.error?.message ?? "Could not create workspace");
     }
-    await authClient.organization.setActive({ organizationId: res.data.id });
+    const active = await authClient.organization.setActive({ organizationId: res.data.id });
+    if (active.error) {
+      setBusy(false);
+      return setError(active.error.message ?? "Workspace created, but could not open it");
+    }
     router.push("/dashboard");
     router.refresh();
   }
