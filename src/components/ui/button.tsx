@@ -9,6 +9,7 @@ export const buttonVariants = cva(
       variant: {
         default: "border border-primary bg-primary text-primary-foreground",
         outline: "border border-border bg-background text-foreground",
+        destructive: "border border-destructive bg-destructive text-destructive-foreground",
       },
     },
     defaultVariants: { variant: "default" },
