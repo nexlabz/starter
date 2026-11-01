@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmButton } from "@/components/confirm-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,6 +9,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { attempt, reportAuthError } from "@/lib/feedback";
+import type { MemberRole } from "@/lib/team";
 
 export function InviteForm({ emailOn }: { emailOn: boolean }) {
   const router = useRouter();
@@ -41,24 +43,46 @@ export function InviteForm({ emailOn }: { emailOn: boolean }) {
   );
 }
 
-export function RemoveMemberButton({ memberId }: { memberId: string }) {
+export function RemoveMemberButton({ memberId, name }: { memberId: string; name: string }) {
+  const router = useRouter();
+  return (
+    <ConfirmButton
+      label="Remove"
+      title={`Remove ${name}?`}
+      description="They lose access to this workspace straight away. You can invite them again later."
+      confirmLabel="Remove member"
+      onConfirm={async () => {
+        const res = await attempt(() => authClient.organization.removeMember({ memberIdOrEmail: memberId }));
+        if (!res || reportAuthError(res.error, "Could not remove member")) return false;
+        toast.success(`${name} removed.`);
+        router.refresh();
+        return true;
+      }}
+    />
+  );
+}
+
+export function MemberRoleSelect({ memberId, name, role, roles }: { memberId: string; name: string; role: string; roles: MemberRole[] }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   return (
-    <Button
-      variant="outline"
-      pending={pending}
-      onClick={() =>
+    <Select
+      value={role}
+      disabled={pending}
+      onValueChange={(next) =>
         start(async () => {
-          const res = await attempt(() => authClient.organization.removeMember({ memberIdOrEmail: memberId }));
-          if (!res || reportAuthError(res.error, "Could not remove member")) return;
-          toast.success("Member removed.");
+          const res = await attempt(() => authClient.organization.updateMemberRole({ memberId, role: next as MemberRole }));
+          if (!res || reportAuthError(res.error, "Could not change role")) return;
+          toast.success(`${name} is now ${next === "member" ? "a member" : `an ${next}`}.`);
           router.refresh();
         })
       }
     >
-      Remove
-    </Button>
+      <SelectTrigger aria-label={`Role for ${name}`}><SelectValue /></SelectTrigger>
+      <SelectContent>
+        {roles.map((r) => (<SelectItem key={r} value={r}>{r[0].toUpperCase() + r.slice(1)}</SelectItem>))}
+      </SelectContent>
+    </Select>
   );
 }
 

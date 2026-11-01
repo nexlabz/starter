@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { and, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { CancelInvitationButton, CopyInviteLinkButton, InviteForm, RemoveMemberButton } from "@/components/team-actions";
+import { CancelInvitationButton, CopyInviteLinkButton, InviteForm, MemberRoleSelect, RemoveMemberButton } from "@/components/team-actions";
 import { getEntitlement } from "@/lib/billing/entitlements";
 import { appUrl, emailEnabled } from "@/lib/env";
 import { isAdminRole, requireOrgSession } from "@/lib/session";
+import { isOwnerRole, memberControls } from "@/lib/team";
 
 export const metadata: Metadata = { title: "Team" };
 
@@ -20,6 +21,7 @@ export default async function TeamPage() {
     db.select().from(schema.invitation).where(and(eq(schema.invitation.organizationId, s.orgId), eq(schema.invitation.status, "pending"))),
     getEntitlement(db, s.orgId),
   ]);
+  const ownerCount = members.filter((m) => isOwnerRole(m.role)).length;
 
   return (
     <div className="space-y-8">
@@ -31,12 +33,23 @@ export default async function TeamPage() {
       <section aria-labelledby="members">
         <h2 id="members" className="mb-2 font-semibold">Members</h2>
         <ul className="divide-y divide-border rounded-xl border border-border">
-          {members.map((m) => (
-            <li key={m.id} className="flex items-center justify-between p-4">
-              <div><p className="font-medium">{m.name}</p><p className="text-sm text-muted-foreground">{m.email} · {m.role}</p></div>
-              {admin && m.userId !== s.user.id && m.role !== "owner" && <RemoveMemberButton memberId={m.id} />}
-            </li>
-          ))}
+          {members.map((m) => {
+            const { manageable, roles } = memberControls({ viewerRole: s.role, targetRole: m.role, self: m.userId === s.user.id, ownerCount });
+            return (
+              <li key={m.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+                <div className="min-w-0">
+                  <p className="font-medium">{m.name}</p>
+                  <p className="truncate text-sm text-muted-foreground">{m.email}{manageable ? "" : ` · ${m.role}`}</p>
+                </div>
+                {manageable && (
+                  <span className="flex gap-2">
+                    <MemberRoleSelect memberId={m.id} name={m.name} role={m.role} roles={roles} />
+                    <RemoveMemberButton memberId={m.id} name={m.name} />
+                  </span>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </section>
       {invites.length > 0 && (
