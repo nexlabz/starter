@@ -44,6 +44,25 @@ pnpm dev
 
 Open http://localhost:3000, sign up, create a workspace. Emails print to the terminal until you add Resend.
 
+## Environment checklist
+
+Only the first two keys are required. Everything else has a safe behaviour when unset, and `/api/health` shows the billing and email mode of any environment.
+
+| Key | Required? | Without it |
+|---|---|---|
+| `DATABASE_URL` | **Required** | The server refuses to boot in production |
+| `BETTER_AUTH_SECRET` | **Required** | The server refuses to boot in production |
+| `NEXT_PUBLIC_APP_URL` | Custom domains | Uses the Vercel production domain, or `http://localhost:3000`. Requests from any other origin fail sign-in with "Invalid origin" |
+| `RESEND_API_KEY` | Recommended in production | No email goes out. Locally it prints to the terminal. In production, invites still work: copy the link from the Team page |
+| `EMAIL_FROM` | With Resend | Uses Resend's test sender, which only delivers to your own address |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional, set both | The "Continue with Google" button is hidden |
+| `POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET` | Optional, set both | Billing is off: everyone is on Free and checkout buttons are disabled |
+| `POLAR_PRODUCT_*` | With Polar | That plan's button shows "Product not set" |
+| `POLAR_SERVER` | With Polar | Uses `sandbox`, so set `production` to take real payments |
+| `POSTGRES_PORT` | Optional | Local Docker Postgres uses port 5433 |
+
+Details and where to get each key are in [docs/SETUP.md](docs/SETUP.md).
+
 ## Docs
 
 | Doc | Covers |

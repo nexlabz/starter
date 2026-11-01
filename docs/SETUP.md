@@ -8,7 +8,7 @@ Copy `.env.example` to `.env`. On Vercel, set the same names under Project Setti
 |---|---|---|---|
 | Postgres (Neon, or local Docker) | All data | **Yes** | neon.tech → project → Connection string |
 | Vercel | Hosting, Analytics | For deploying | vercel.com |
-| Resend | Verification and invitation email | **Yes in production** | resend.com → API Keys, then verify a sending domain |
+| Resend | Verification and invitation email | Recommended in production | resend.com → API Keys, then verify a sending domain |
 | Polar | Payments | Optional | sandbox.polar.sh (test), polar.sh (live). See BILLING.md |
 | Google Cloud | "Continue with Google" | Optional | Console → Credentials → OAuth client |
 
@@ -19,7 +19,7 @@ Copy `.env.example` to `.env`. On Vercel, set the same names under Project Setti
 | `DATABASE_URL` | Yes | Postgres connection string |
 | `BETTER_AUTH_SECRET` | Yes | 32+ chars: `openssl rand -base64 32`. Changing it signs everyone out |
 | `NEXT_PUBLIC_APP_URL` | Custom domains | Public URL. On Vercel the production domain is detected if unset. Sign-in rejects requests from any other origin, so set it if you see "Invalid origin" |
-| `RESEND_API_KEY` | Production | Without it, dev prints email to the console and production throws |
+| `RESEND_API_KEY` | Recommended in production | Without it, dev prints email to the console. In production, invitations skip delivery (copy the link from the Team page) and any other email fails. Required if you turn on email verification |
 | `EMAIL_FROM` | With Resend | Must be on your verified domain |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional | Set both. Redirect URI: `<app url>/api/auth/callback/google` |
 | `POLAR_SERVER` | With Polar | `sandbox` or `production` |
@@ -33,4 +33,4 @@ Check any environment at `/api/health`: it shows the database status, billing mo
 
 ## Turn on email verification
 
-Once Resend works, set `requireEmailVerification: true` in `src/lib/auth.ts`.
+Once Resend works, set `requireEmailVerification: true` in `src/lib/auth.ts`. Without Resend in production, nobody could verify and sign-in would be blocked.
