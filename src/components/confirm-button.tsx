@@ -8,11 +8,12 @@ import { Button } from "@/components/ui/button";
  * A button that asks before running a destructive action. `onConfirm` resolves
  * true to close the dialog, or false to stay open after a failure.
  */
-export function ConfirmButton({ label, title, description, confirmLabel, onConfirm, children }: {
+export function ConfirmButton({ label, title, description, confirmLabel, confirmDisabled, onConfirm, children }: {
   label: string;
   title: string;
   description: string;
   confirmLabel: string;
+  confirmDisabled?: boolean;
   onConfirm: () => Promise<boolean>;
   children?: React.ReactNode;
 }) {
@@ -30,6 +31,7 @@ export function ConfirmButton({ label, title, description, confirmLabel, onConfi
           <Button
             variant="destructive"
             pending={pending}
+            disabled={confirmDisabled}
             onClick={() =>
               start(async () => {
                 if (await onConfirm()) setOpen(false);
