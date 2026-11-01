@@ -1,6 +1,8 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { authClient } from "@/lib/auth-client";
 
 export function OrgSwitcher({ activeId }: { activeId: string }) {
@@ -8,18 +10,19 @@ export function OrgSwitcher({ activeId }: { activeId: string }) {
   const { data: orgs } = authClient.useListOrganizations();
   if (!orgs) return null;
   return (
-    <select
-      aria-label="Switch workspace"
-      className="input !w-auto"
+    <Select
       value={activeId}
-      onChange={async (e) => {
-        if (e.target.value === "__new") return router.push("/onboarding");
-        await authClient.organization.setActive({ organizationId: e.target.value });
+      onValueChange={async (value) => {
+        if (value === "__new") return router.push("/onboarding");
+        await authClient.organization.setActive({ organizationId: value });
         router.refresh();
       }}
     >
-      {orgs.map((o) => (<option key={o.id} value={o.id}>{o.name}</option>))}
-      <option value="__new">+ New workspace…</option>
-    </select>
+      <SelectTrigger aria-label="Switch workspace"><SelectValue /></SelectTrigger>
+      <SelectContent>
+        {orgs.map((o) => (<SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>))}
+        <SelectItem value="__new"><span className="inline-flex items-center gap-1"><Plus className="size-4" aria-hidden />New workspace</span></SelectItem>
+      </SelectContent>
+    </Select>
   );
 }

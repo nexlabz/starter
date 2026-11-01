@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
@@ -30,9 +32,9 @@ export function OnboardingForm() {
 
   return (
     <form onSubmit={onSubmit} className="mt-6 space-y-4">
-      <label className="block text-sm">Workspace name<input name="name" required minLength={2} className="input mt-1" placeholder="Acme Inc." /></label>
-      {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-      <button className="btn btn-primary w-full" disabled={busy}>{busy ? "Creating…" : "Create workspace"}</button>
+      <label className="block text-sm">Workspace name<Input name="name" required minLength={2} className="mt-1" placeholder="Acme Inc." /></label>
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+      <Button className="w-full" disabled={busy}>{busy ? "Creating…" : "Create workspace"}</Button>
     </form>
   );
 }

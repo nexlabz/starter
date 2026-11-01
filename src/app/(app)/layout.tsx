@@ -24,9 +24,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <Link href="/dashboard" className="font-bold">{site.name}</Link>
           <OrgSwitcher activeId={s.orgId} />
           <nav aria-label="App" className="ml-2 flex gap-4 text-sm">
-            {nav.map((n) => (<Link key={n.href} href={n.href} className="text-muted hover:text-foreground">{n.label}</Link>))}
+            {nav.map((n) => (<Link key={n.href} href={n.href} className="text-muted-foreground hover:text-foreground">{n.label}</Link>))}
           </nav>
-          <div className="ml-auto flex items-center gap-3 text-sm text-muted">
+          <div className="ml-auto flex items-center gap-3 text-sm text-muted-foreground">
             <span>{s.user.email}</span>
             <SignOutButton />
           </div>

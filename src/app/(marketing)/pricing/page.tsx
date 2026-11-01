@@ -11,7 +11,7 @@ export default function PricingPage() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-20">
       <h1 className="text-center text-4xl font-bold">Pricing</h1>
-      <p className="mx-auto mt-3 max-w-xl text-center text-muted">
+      <p className="mx-auto mt-3 max-w-xl text-center text-muted-foreground">
         Plans are billed per organization. Start free, upgrade when your team needs more.
       </p>
       <div className="mt-12"><PricingTable /></div>

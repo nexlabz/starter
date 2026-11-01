@@ -25,7 +25,7 @@ export default async function TeamPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold">Team</h1>
-        <p className="text-sm text-muted">{members.length} of {ent.plan.limits.seats} seats used on the {ent.plan.name} plan.</p>
+        <p className="text-sm text-muted-foreground">{members.length} of {ent.plan.limits.seats} seats used on the {ent.plan.name} plan.</p>
       </div>
       {admin && <InviteForm emailOn={emailEnabled()} />}
       <section aria-labelledby="members">
@@ -33,7 +33,7 @@ export default async function TeamPage() {
         <ul className="divide-y divide-border rounded-xl border border-border">
           {members.map((m) => (
             <li key={m.id} className="flex items-center justify-between p-4">
-              <div><p className="font-medium">{m.name}</p><p className="text-sm text-muted">{m.email} · {m.role}</p></div>
+              <div><p className="font-medium">{m.name}</p><p className="text-sm text-muted-foreground">{m.email} · {m.role}</p></div>
               {admin && m.userId !== s.user.id && m.role !== "owner" && <RemoveMemberButton memberId={m.id} />}
             </li>
           ))}
