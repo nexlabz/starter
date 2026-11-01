@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { authClient } from "@/lib/auth-client";
 import { attempt, reportAuthError } from "@/lib/feedback";
 
@@ -14,23 +14,26 @@ export function AuthForm({ mode, google }: { mode: "sign-in" | "sign-up"; google
   const next = params.get("next");
   const dest = next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [pending, start] = useTransition();
+  const [googlePending, startGoogle] = useTransition();
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setBusy(true);
     setError(null);
     const f = new FormData(e.currentTarget);
     const email = String(f.get("email"));
     const password = String(f.get("password"));
-    const res =
-      mode === "sign-up"
-        ? await authClient.signUp.email({ email, password, name: String(f.get("name")) })
-        : await authClient.signIn.email({ email, password });
-    setBusy(false);
-    if (res.error) return setError(res.error.message ?? "Something went wrong");
-    router.push(dest);
-    router.refresh();
+    start(async () => {
+      const res = await attempt(() =>
+        mode === "sign-up"
+          ? authClient.signUp.email({ email, password, name: String(f.get("name")) })
+          : authClient.signIn.email({ email, password }),
+      );
+      if (!res) return;
+      if (res.error) return setError(res.error.message ?? "Something went wrong");
+      router.push(dest);
+      router.refresh();
+    });
   }
 
   return (
@@ -43,16 +46,19 @@ export function AuthForm({ mode, google }: { mode: "sign-in" | "sign-up"; google
         <label className="block text-sm">Email<Input name="email" type="email" required className="mt-1" autoComplete="email" /></label>
         <label className="block text-sm">Password<Input name="password" type="password" required minLength={10} className="mt-1" autoComplete={mode === "sign-up" ? "new-password" : "current-password"} /></label>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-        <Button className="w-full" disabled={busy}>{busy ? "…" : mode === "sign-up" ? "Sign up" : "Sign in"}</Button>
+        <Button className="w-full" pending={pending}>{mode === "sign-up" ? "Sign up" : "Sign in"}</Button>
       </form>
       {google && (
         <Button
           variant="outline"
           className="mt-3 w-full"
-          onClick={async () => {
-            const res = await attempt(() => authClient.signIn.social({ provider: "google", callbackURL: dest }));
-            if (res) reportAuthError(res.error, "Could not sign in with Google");
-          }}
+          pending={googlePending}
+          onClick={() =>
+            startGoogle(async () => {
+              const res = await attempt(() => authClient.signIn.social({ provider: "google", callbackURL: dest }));
+              if (res) reportAuthError(res.error, "Could not sign in with Google");
+            })
+          }
         >
           Continue with Google
         </Button>
