@@ -20,7 +20,7 @@ export async function GET() {
       db: dbOk,
       billing: billingEnabled() ? `polar:${env.POLAR_SERVER}` : "disabled",
       email: env.RESEND_API_KEY ? "resend" : "console",
-      commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null,
+      commit: (process.env.VERCEL_GIT_COMMIT_SHA || process.env.COMMIT_SHA)?.slice(0, 7) ?? null,
     },
     { status: dbOk ? 200 : 503 },
   );
