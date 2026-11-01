@@ -1,3 +1,5 @@
+import { buttonVariants } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { JsonLd } from "@/components/json-ld";
 import { PricingTable } from "@/components/pricing-table";
@@ -35,10 +37,10 @@ export default function Home() {
       />
       <section className="mx-auto max-w-4xl px-6 py-24 text-center">
         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">{site.tagline}</h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-muted">{site.description}</p>
+        <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">{site.description}</p>
         <div className="mt-10 flex justify-center gap-3">
-          <Link href="/sign-up" className="btn btn-primary">Start free</Link>
-          <Link href="/pricing" className="btn">See pricing</Link>
+          <Link href="/sign-up" className={buttonVariants()}>Start free</Link>
+          <Link href="/pricing" className={buttonVariants({ variant: "outline" })}>See pricing</Link>
         </div>
       </section>
 
@@ -46,10 +48,10 @@ export default function Home() {
         <h2 id="features" className="text-center text-3xl font-bold">Everything a SaaS needs on day one</h2>
         <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
-            <div key={f.t} className="card">
+            <Card key={f.t}>
               <h3 className="font-semibold">{f.t}</h3>
-              <p className="mt-2 text-sm text-muted">{f.d}</p>
-            </div>
+              <p className="mt-2 text-sm text-muted-foreground">{f.d}</p>
+            </Card>
           ))}
         </div>
       </section>
@@ -65,7 +67,7 @@ export default function Home() {
           {faqs.map((f) => (
             <div key={f.q}>
               <dt className="font-semibold">{f.q}</dt>
-              <dd className="mt-1 text-sm text-muted">{f.a}</dd>
+              <dd className="mt-1 text-sm text-muted-foreground">{f.a}</dd>
             </div>
           ))}
         </dl>

@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
@@ -21,10 +24,16 @@ export function InviteForm({ emailOn }: { emailOn: boolean }) {
         if (!res.error) { (e.target as HTMLFormElement).reset(); router.refresh(); }
       }}
     >
-      <input name="email" type="email" required placeholder="teammate@company.com" className="input !w-64" aria-label="Email" />
-      <select name="role" className="input !w-auto" aria-label="Role" defaultValue="member"><option value="member">Member</option><option value="admin">Admin</option></select>
-      <button className="btn btn-primary" disabled={busy}>Invite</button>
-      {msg && <p role="status" className={`w-full text-sm ${msg.ok ? "text-muted" : "text-danger"}`}>{msg.text}</p>}
+      <Input name="email" type="email" required placeholder="teammate@company.com" className="w-64" aria-label="Email" />
+      <Select name="role" defaultValue="member">
+        <SelectTrigger aria-label="Role"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="member">Member</SelectItem>
+          <SelectItem value="admin">Admin</SelectItem>
+        </SelectContent>
+      </Select>
+      <Button disabled={busy}>Invite</Button>
+      {msg && <p role="status" className={`w-full text-sm ${msg.ok ? "text-muted-foreground" : "text-destructive"}`}>{msg.text}</p>}
     </form>
   );
 }
@@ -32,33 +41,32 @@ export function InviteForm({ emailOn }: { emailOn: boolean }) {
 export function RemoveMemberButton({ memberId }: { memberId: string }) {
   const router = useRouter();
   return (
-    <button className="btn" onClick={async () => { await authClient.organization.removeMember({ memberIdOrEmail: memberId }); router.refresh(); }}>
+    <Button variant="outline" onClick={async () => { await authClient.organization.removeMember({ memberIdOrEmail: memberId }); router.refresh(); }}>
       Remove
-    </button>
+    </Button>
   );
 }
 
 export function CopyInviteLinkButton({ link }: { link: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <button
-      className="btn"
+    <Button variant="outline"
       onClick={async () => {
         await navigator.clipboard.writeText(link);
         setCopied(true);
       }}
     >
       {copied ? "Copied" : "Copy link"}
-    </button>
+    </Button>
   );
 }
 
 export function CancelInvitationButton({ id }: { id: string }) {
   const router = useRouter();
   return (
-    <button className="btn" onClick={async () => { await authClient.organization.cancelInvitation({ invitationId: id }); router.refresh(); }}>
+    <Button variant="outline" onClick={async () => { await authClient.organization.cancelInvitation({ invitationId: id }); router.refresh(); }}>
       Cancel
-    </button>
+    </Button>
   );
 }
 
@@ -67,8 +75,7 @@ export function AcceptInvitation({ id }: { id: string }) {
   const [error, setError] = useState<string | null>(null);
   return (
     <div className="mt-6">
-      <button
-        className="btn btn-primary"
+      <Button
         onClick={async () => {
           const res = await authClient.organization.acceptInvitation({ invitationId: id });
           if (res.error) return setError(res.error.message ?? "Could not accept");
@@ -76,8 +83,8 @@ export function AcceptInvitation({ id }: { id: string }) {
         }}
       >
         Accept invitation
-      </button>
-      {error && <p role="alert" className="mt-3 text-sm text-danger">{error}</p>}
+      </Button>
+      {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
     </div>
   );
 }

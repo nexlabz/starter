@@ -14,7 +14,7 @@ export default async function AcceptInvitationPage({ params }: { params: Promise
   return (
     <main className="mx-auto w-full max-w-sm px-6 py-24">
       <h1 className="text-2xl font-bold">You&apos;ve been invited</h1>
-      <p className="mt-2 text-sm text-muted">Signed in as {session.user.email}. Accept to join the workspace.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Signed in as {session.user.email}. Accept to join the workspace.</p>
       <AcceptInvitation id={id} />
     </main>
   );

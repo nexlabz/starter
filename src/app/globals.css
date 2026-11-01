@@ -1,26 +1,47 @@
 @import "tailwindcss";
 
-/* Design tokens. Rebrand here (and in src/config/site.ts). */
+/* Design tokens, using shadcn/ui names so `shadcn add` output works here.
+   Rebrand here (and in src/config/site.ts). */
 :root {
   --background: #ffffff;
   --foreground: #0f172a;
-  --muted: #64748b;
+  --card: #f8fafc;
+  --card-foreground: var(--foreground);
+  --popover: #ffffff;
+  --popover-foreground: var(--foreground);
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #f8fafc;
+  --secondary-foreground: var(--foreground);
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: var(--foreground);
+  --destructive: #dc2626;
   --border: #e2e8f0;
-  --surface: #f8fafc;
-  --brand: #4f46e5;
-  --brand-foreground: #ffffff;
-  --danger: #dc2626;
+  --input: #e2e8f0;
+  --ring: #4f46e5;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
   --color-border: var(--border);
-  --color-surface: var(--surface);
-  --color-brand: var(--brand);
-  --color-brand-foreground: var(--brand-foreground);
-  --color-danger: var(--danger);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -29,9 +50,14 @@
   :root {
     --background: #0b1020;
     --foreground: #e5e7eb;
-    --muted: #94a3b8;
+    --card: #111827;
+    --popover: #111827;
+    --secondary: #111827;
+    --muted: #111827;
+    --muted-foreground: #94a3b8;
+    --accent: #1e293b;
     --border: #1e293b;
-    --surface: #111827;
+    --input: #1e293b;
   }
 }
 
@@ -40,18 +66,3 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
 }
-
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
-  border-radius: .5rem; padding: .5rem 1rem; font-size: .875rem; font-weight: 600;
-  border: 1px solid var(--border); background: var(--background); color: var(--foreground);
-  cursor: pointer; transition: opacity .15s;
-}
-.btn:hover { opacity: .85; }
-.btn:disabled { opacity: .5; cursor: not-allowed; }
-.btn-primary { background: var(--brand); color: var(--brand-foreground); border-color: var(--brand); }
-.input {
-  width: 100%; border-radius: .5rem; border: 1px solid var(--border);
-  background: var(--background); padding: .5rem .75rem; font-size: .875rem;
-}
-.card { border: 1px solid var(--border); border-radius: .75rem; background: var(--surface); padding: 1.25rem; }

@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { sql } from "drizzle-orm";
@@ -18,9 +19,9 @@ export default async function Dashboard() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Dashboard</h1>
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="card"><p className="text-sm text-muted">Plan</p><p className="text-2xl font-bold">{ent.plan.name}</p><Link href="/billing" className="text-sm underline">Manage billing</Link></div>
-        <div className="card"><p className="text-sm text-muted">Projects</p><p className="text-2xl font-bold">{n} / {ent.plan.limits.projects}</p><Link href="/projects" className="text-sm underline">View projects</Link></div>
-        <div className="card"><p className="text-sm text-muted">Your role</p><p className="text-2xl font-bold capitalize">{s.role}</p><Link href="/team" className="text-sm underline">Team</Link></div>
+        <Card><p className="text-sm text-muted-foreground">Plan</p><p className="text-2xl font-bold">{ent.plan.name}</p><Link href="/billing" className="text-sm underline">Manage billing</Link></Card>
+        <Card><p className="text-sm text-muted-foreground">Projects</p><p className="text-2xl font-bold">{n} / {ent.plan.limits.projects}</p><Link href="/projects" className="text-sm underline">View projects</Link></Card>
+        <Card><p className="text-sm text-muted-foreground">Your role</p><p className="text-2xl font-bold capitalize">{s.role}</p><Link href="/team" className="text-sm underline">Team</Link></Card>
       </div>
     </div>
   );
