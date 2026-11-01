@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { attempt, reportAuthError } from "@/lib/feedback";
 
 export function InviteForm({ emailOn }: { emailOn: boolean }) {
   const router = useRouter();
-  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
   return (
     <form
@@ -17,11 +18,14 @@ export function InviteForm({ emailOn }: { emailOn: boolean }) {
       onSubmit={async (e) => {
         e.preventDefault();
         setBusy(true);
-        const f = new FormData(e.currentTarget);
-        const res = await authClient.organization.inviteMember({ email: String(f.get("email")), role: String(f.get("role")) as "member" | "admin" });
+        const form = e.currentTarget;
+        const f = new FormData(form);
+        const res = await attempt(() => authClient.organization.inviteMember({ email: String(f.get("email")), role: String(f.get("role")) as "member" | "admin" }));
         setBusy(false);
-        setMsg(res.error ? { ok: false, text: res.error.message ?? "Could not invite" } : { ok: true, text: emailOn ? "Invitation sent." : "Invitation created. Copy its link below and send it yourself." });
-        if (!res.error) { (e.target as HTMLFormElement).reset(); router.refresh(); }
+        if (!res || reportAuthError(res.error, "Could not invite")) return;
+        toast.success(emailOn ? "Invitation sent." : "Invitation created. Copy its link below and send it yourself.");
+        form.reset();
+        router.refresh();
       }}
     >
       <Input name="email" type="email" required placeholder="teammate@company.com" className="w-64" aria-label="Email" />
@@ -33,7 +37,6 @@ export function InviteForm({ emailOn }: { emailOn: boolean }) {
         </SelectContent>
       </Select>
       <Button disabled={busy}>Invite</Button>
-      {msg && <p role="status" className={`w-full text-sm ${msg.ok ? "text-muted-foreground" : "text-destructive"}`}>{msg.text}</p>}
     </form>
   );
 }
@@ -41,7 +44,15 @@ export function InviteForm({ emailOn }: { emailOn: boolean }) {
 export function RemoveMemberButton({ memberId }: { memberId: string }) {
   const router = useRouter();
   return (
-    <Button variant="outline" onClick={async () => { await authClient.organization.removeMember({ memberIdOrEmail: memberId }); router.refresh(); }}>
+    <Button
+      variant="outline"
+      onClick={async () => {
+        const res = await attempt(() => authClient.organization.removeMember({ memberIdOrEmail: memberId }));
+        if (!res || reportAuthError(res.error, "Could not remove member")) return;
+        toast.success("Member removed.");
+        router.refresh();
+      }}
+    >
       Remove
     </Button>
   );
@@ -52,8 +63,10 @@ export function CopyInviteLinkButton({ link }: { link: string }) {
   return (
     <Button variant="outline"
       onClick={async () => {
-        await navigator.clipboard.writeText(link);
+        const done = await attempt(() => navigator.clipboard.writeText(link).then(() => true), "Could not copy the link");
+        if (!done) return;
         setCopied(true);
+        toast.success("Invite link copied.");
       }}
     >
       {copied ? "Copied" : "Copy link"}
@@ -64,7 +77,15 @@ export function CopyInviteLinkButton({ link }: { link: string }) {
 export function CancelInvitationButton({ id }: { id: string }) {
   const router = useRouter();
   return (
-    <Button variant="outline" onClick={async () => { await authClient.organization.cancelInvitation({ invitationId: id }); router.refresh(); }}>
+    <Button
+      variant="outline"
+      onClick={async () => {
+        const res = await attempt(() => authClient.organization.cancelInvitation({ invitationId: id }));
+        if (!res || reportAuthError(res.error, "Could not cancel invitation")) return;
+        toast.success("Invitation cancelled.");
+        router.refresh();
+      }}
+    >
       Cancel
     </Button>
   );
@@ -72,19 +93,18 @@ export function CancelInvitationButton({ id }: { id: string }) {
 
 export function AcceptInvitation({ id }: { id: string }) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
   return (
     <div className="mt-6">
       <Button
         onClick={async () => {
-          const res = await authClient.organization.acceptInvitation({ invitationId: id });
-          if (res.error) return setError(res.error.message ?? "Could not accept");
+          const res = await attempt(() => authClient.organization.acceptInvitation({ invitationId: id }));
+          if (!res || reportAuthError(res.error, "Could not accept")) return;
+          toast.success("Invitation accepted.");
           router.push("/dashboard"); router.refresh();
         }}
       >
         Accept invitation
       </Button>
-      {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { APIError } from "better-auth/api";
 import { organization } from "better-auth/plugins";
 import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
 import { createPolarCore } from "@polar-sh/sdk/2026-10";
@@ -8,7 +9,8 @@ import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { applyPolarEvent } from "@/lib/billing/apply-event";
 import { checkoutProducts } from "@/lib/billing/catalog";
-import { getEntitlement } from "@/lib/billing/entitlements";
+import { getEntitlement, seatsTaken } from "@/lib/billing/entitlements";
+import { SEAT_LIMIT_CODE } from "@/lib/billing/limit-codes";
 import { sendEmail, sendInvitation } from "@/lib/email";
 import { appUrl, billingEnabled, getEnv, googleEnabled } from "@/lib/env";
 import { site } from "@/config/site";
@@ -69,6 +71,19 @@ export const auth = betterAuth({
     organization({
       // Seats come from the org's plan (catalog.ts), enforced when a member is added.
       membershipLimit: async (_user, org) => (await getEntitlement(db, org.id)).plan.limits.seats,
+      organizationHooks: {
+        // Stop at the invite too, so the admin hears about the limit rather than the invitee.
+        beforeCreateInvitation: async ({ organization: org }) => {
+          const { plan } = await getEntitlement(db, org.id);
+          const taken = await seatsTaken(db, org.id);
+          if (taken >= plan.limits.seats) {
+            throw new APIError("FORBIDDEN", {
+              code: SEAT_LIMIT_CODE,
+              message: `The ${plan.name} plan allows ${plan.limits.seats} seats, counting pending invitations. Upgrade to invite more.`,
+            });
+          }
+        },
+      },
       async sendInvitationEmail(data) {
         const link = `${baseURL}/accept-invitation/${data.id}`;
         await sendInvitation({

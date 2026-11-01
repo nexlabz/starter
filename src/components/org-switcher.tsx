@@ -2,8 +2,10 @@
 
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { authClient } from "@/lib/auth-client";
+import { attempt, reportAuthError } from "@/lib/feedback";
 
 export function OrgSwitcher({ activeId }: { activeId: string }) {
   const router = useRouter();
@@ -14,7 +16,9 @@ export function OrgSwitcher({ activeId }: { activeId: string }) {
       value={activeId}
       onValueChange={async (value) => {
         if (value === "__new") return router.push("/onboarding");
-        await authClient.organization.setActive({ organizationId: value });
+        const res = await attempt(() => authClient.organization.setActive({ organizationId: value }));
+        if (!res || reportAuthError(res.error, "Could not switch workspace")) return;
+        toast.success(`Switched to ${orgs.find((o) => o.id === value)?.name ?? "workspace"}.`);
         router.refresh();
       }}
     >

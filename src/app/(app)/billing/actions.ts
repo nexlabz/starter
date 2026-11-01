@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import type { ActionResult } from "@/lib/action-result";
 import { auth } from "@/lib/auth";
 import { getPlan } from "@/lib/billing/catalog";
 import { billingEnabled } from "@/lib/env";
@@ -12,13 +13,13 @@ import { isAdminRole, requireOrgSession } from "@/lib/session";
  * reference_id is set here, server-side, after verifying membership. The client
  * never supplies it (the Polar plugin does not check org membership itself).
  */
-export async function startCheckout(formData: FormData) {
+export async function startCheckout(planKey: string): Promise<ActionResult> {
   const s = await requireOrgSession();
-  if (!isAdminRole(s.role)) redirect("/billing?error=forbidden");
-  if (!billingEnabled()) redirect("/billing?error=disabled");
+  if (!isAdminRole(s.role)) return { ok: false, message: "Only owners and admins can change billing." };
+  if (!billingEnabled()) return { ok: false, message: "Billing is not configured. Add the Polar keys from docs/BILLING.md." };
 
-  const plan = getPlan(String(formData.get("plan")));
-  if (!plan || plan.mode === "free") redirect("/billing?error=plan");
+  const plan = getPlan(planKey);
+  if (!plan || plan.mode === "free") return { ok: false, message: "Unknown plan." };
 
   let url: string | undefined;
   try {
@@ -30,6 +31,6 @@ export async function startCheckout(formData: FormData) {
   } catch (e) {
     console.error("[billing] checkout failed", e);
   }
-  if (!url) redirect("/billing?error=checkout");
+  if (!url) return { ok: false, message: "Could not start checkout. Is the product id for this plan set?" };
   redirect(url);
 }
