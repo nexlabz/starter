@@ -7,9 +7,10 @@ import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
 import { createPolarCore } from "@polar-sh/sdk/2026-10";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
+import { soleOwnedWorkspaces } from "@/lib/account";
 import { applyPolarEvent } from "@/lib/billing/apply-event";
 import { checkoutProducts } from "@/lib/billing/catalog";
-import { getEntitlement, seatsTaken } from "@/lib/billing/entitlements";
+import { getEntitlement, hasActiveSubscription, seatsTaken } from "@/lib/billing/entitlements";
 import { SEAT_LIMIT_CODE } from "@/lib/billing/limit-codes";
 import { sendEmail, sendInvitation } from "@/lib/email";
 import { appUrl, billingEnabled, getEnv, googleEnabled } from "@/lib/env";
@@ -33,6 +34,22 @@ export const auth = betterAuth({
     .filter((v): v is string => Boolean(v))
     .map((v) => (v.startsWith("http") ? v : `https://${v}`)),
   database: drizzleAdapter(db, { provider: "pg", schema }),
+
+  user: {
+    deleteUser: {
+      enabled: true,
+      // Deleting an account must not leave a workspace with no owner.
+      beforeDelete: async (user) => {
+        const sole = await soleOwnedWorkspaces(db, user.id);
+        if (sole.length > 0) {
+          throw new APIError("BAD_REQUEST", {
+            code: "SOLE_OWNER",
+            message: `You are the only owner of ${sole.join(", ")}. Delete the workspace or make someone else an owner first.`,
+          });
+        }
+      },
+    },
+  },
 
   emailAndPassword: {
     enabled: true,
@@ -72,6 +89,15 @@ export const auth = betterAuth({
       // Seats come from the org's plan (catalog.ts), enforced when a member is added.
       membershipLimit: async (_user, org) => (await getEntitlement(db, org.id)).plan.limits.seats,
       organizationHooks: {
+        // Polar keeps billing a deleted workspace, so the subscription has to end first.
+        beforeDeleteOrganization: async ({ organization: org }) => {
+          if (await hasActiveSubscription(db, org.id)) {
+            throw new APIError("BAD_REQUEST", {
+              code: "ACTIVE_SUBSCRIPTION",
+              message: "This workspace has an active subscription. Cancel it in Billing before deleting the workspace.",
+            });
+          }
+        },
         // Stop at the invite too, so the admin hears about the limit rather than the invitee.
         beforeCreateInvitation: async ({ organization: org }) => {
           const { plan } = await getEntitlement(db, org.id);

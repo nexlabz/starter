@@ -61,3 +61,14 @@ export async function seatsTaken(db: AnyDb, orgId: string): Promise<number> {
   ]);
   return members.n + invites.n;
 }
+
+/** True while Polar is still charging this org. Deleting the org would not stop that. */
+export async function hasActiveSubscription(db: AnyDb, orgId: string): Promise<boolean> {
+  const d = db as NodePgDatabase<typeof schema>;
+  const [row] = await d
+    .select({ id: schema.subscription.id })
+    .from(schema.subscription)
+    .where(and(eq(schema.subscription.orgId, orgId), inArray(schema.subscription.status, [...ENTITLED_STATUSES])))
+    .limit(1);
+  return Boolean(row);
+}
