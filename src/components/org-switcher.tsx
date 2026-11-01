@@ -2,6 +2,7 @@
 
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { authClient } from "@/lib/auth-client";
@@ -10,16 +11,20 @@ import { attempt, reportAuthError } from "@/lib/feedback";
 export function OrgSwitcher({ activeId }: { activeId: string }) {
   const router = useRouter();
   const { data: orgs } = authClient.useListOrganizations();
+  const [pending, start] = useTransition();
   if (!orgs) return null;
   return (
     <Select
       value={activeId}
-      onValueChange={async (value) => {
+      disabled={pending}
+      onValueChange={(value) => {
         if (value === "__new") return router.push("/onboarding");
-        const res = await attempt(() => authClient.organization.setActive({ organizationId: value }));
-        if (!res || reportAuthError(res.error, "Could not switch workspace")) return;
-        toast.success(`Switched to ${orgs.find((o) => o.id === value)?.name ?? "workspace"}.`);
-        router.refresh();
+        start(async () => {
+          const res = await attempt(() => authClient.organization.setActive({ organizationId: value }));
+          if (!res || reportAuthError(res.error, "Could not switch workspace")) return;
+          toast.success(`Switched to ${orgs.find((o) => o.id === value)?.name ?? "workspace"}.`);
+          router.refresh();
+        });
       }}
     >
       <SelectTrigger aria-label="Switch workspace"><SelectValue /></SelectTrigger>
