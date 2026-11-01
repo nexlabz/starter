@@ -29,7 +29,7 @@ export function PricingTable({ cta }: { cta?: (plan: Plan) => React.ReactNode })
           </ul>
           <div className="mt-5">
             {cta ? cta(p) : (
-              <Link href="/sign-up" className={`btn w-full ${p.highlight ? "btn-primary" : ""}`}>
+              <Link href={`/start?plan=${p.key}`} prefetch={false} rel="nofollow" className={`btn w-full ${p.highlight ? "btn-primary" : ""}`}>
                 {p.mode === "free" ? "Start free" : "Get started"}
               </Link>
             )}
