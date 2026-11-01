@@ -1,0 +1,18 @@
+# Local Postgres for development: `pnpm db:up`
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432" # change POSTGRES_PORT in .env if 5433 is taken
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 3s
+      retries: 20
+volumes:
+  pgdata:

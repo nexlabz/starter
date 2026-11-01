@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+/* Design tokens. Rebrand here (and in src/config/site.ts). */
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --surface: #f8fafc;
+  --brand: #4f46e5;
+  --brand-foreground: #ffffff;
+  --danger: #dc2626;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-surface: var(--surface);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b1020;
+    --foreground: #e5e7eb;
+    --muted: #94a3b8;
+    --border: #1e293b;
+    --surface: #111827;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  border-radius: .5rem; padding: .5rem 1rem; font-size: .875rem; font-weight: 600;
+  border: 1px solid var(--border); background: var(--background); color: var(--foreground);
+  cursor: pointer; transition: opacity .15s;
+}
+.btn:hover { opacity: .85; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-primary { background: var(--brand); color: var(--brand-foreground); border-color: var(--brand); }
+.input {
+  width: 100%; border-radius: .5rem; border: 1px solid var(--border);
+  background: var(--background); padding: .5rem .75rem; font-size: .875rem;
+}
+.card { border: 1px solid var(--border); border-radius: .75rem; background: var(--surface); padding: 1.25rem; }
