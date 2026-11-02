@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { appUrl } from "@/lib/env";
 
 // Public, indexable routes only. Add new marketing pages here.
-const ROUTES = ["", "/pricing", "/sign-up", "/sign-in"];
+const ROUTES = ["", "/features", "/pricing", "/changelog", "/about", "/contact", "/sign-up", "/sign-in"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = appUrl();

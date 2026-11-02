@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { and, eq } from "drizzle-orm";
 import { DeleteAccountButton, DeleteWorkspaceButton, PasswordForm, ProfileForm, WorkspaceForm } from "@/components/settings-forms";
 import { PageHeader } from "@/components/page-header";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Card } from "@/components/ui/card";
 import { db, schema } from "@/db";
 import { isAdminRole, requireOrgSession } from "@/lib/session";
@@ -36,6 +37,13 @@ export default async function SettingsPage() {
           <ProfileForm name={s.user.name} email={s.user.email} />
         </Card>
         {hasPassword && <Card className="space-y-4"><PasswordForm orgId={s.orgId} /></Card>}
+      </section>
+      <section aria-labelledby="appearance" className="space-y-4">
+        <h2 id="appearance" className="text-xl font-medium">Appearance</h2>
+        <Card className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">Saved in this browser.</p>
+          <ThemeToggle labels />
+        </Card>
       </section>
       <section aria-labelledby="danger" className="space-y-4">
         <h2 id="danger" className="text-xl font-medium text-destructive">Danger zone</h2>

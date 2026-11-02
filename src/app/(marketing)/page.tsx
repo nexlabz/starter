@@ -1,21 +1,14 @@
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { DotField } from "@/components/dot-field";
-import { FeatureTabs, type Feature } from "@/components/feature-tabs";
+import { FeatureTabs } from "@/components/feature-tabs";
 import { JsonLd } from "@/components/json-ld";
+import { CtaBand } from "@/components/marketing";
 import { PricingTable } from "@/components/pricing-table";
+import { features } from "@/config/features";
 import { site } from "@/config/site";
 import { FREE_PLAN, PLANS } from "@/lib/billing/catalog";
 import { appUrl } from "@/lib/env";
-
-const features: Feature[] = [
-  { t: "Multi-tenant from day one", d: "Organizations, members, roles and invitations. Postgres row-level security keeps every tenant's data apart, even if a query forgets its filter.", proof: "withTenant(db, orgId, (tx) => ...)" },
-  { t: "Auth that just works", d: "Email + password and optional Google sign-in with Better Auth. Sessions remember each user's active workspace.", proof: "const { orgId } = await requireOrgSession()" },
-  { t: "Subscriptions and one-time payments", d: "Polar handles checkout, tax and invoices. Sell monthly, yearly and lifetime plans side by side, billed per organization.", proof: "src/lib/billing/catalog.ts" },
-  { t: "SEO ready", d: "Metadata, Open Graph image, sitemap, robots, structured data and Vercel Analytics are wired in and documented.", proof: "sitemap.ts, robots.ts, opengraph-image.tsx" },
-  { t: "Typed, tested, documented", d: "Strict env validation, migration-first Drizzle schema, isolation and billing tests, and setup docs for every account you need.", proof: "pnpm lint && pnpm typecheck && pnpm test" },
-  { t: "Deploy in minutes", d: "One-click Vercel deploy or `gh repo create --template`. Works locally with a single Docker Postgres.", proof: "docker compose up -d --wait" },
-];
 
 const stats = [
   { n: "1", label: "service needed to run it: Postgres" },
@@ -91,15 +84,7 @@ export default function Home() {
         </dl>
       </section>
 
-      <section className="px-2 pt-8">
-        <div className="flex flex-wrap items-end justify-between gap-6 rounded-[28px] bg-signal p-6 text-signal-foreground sm:p-12">
-          <h2 className="max-w-2xl text-[clamp(2.2rem,5vw,4rem)] leading-[1.05] font-medium">Skip the first month of setup.</h2>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/sign-up" className={buttonVariants({ variant: "signal" })}>Start free</Link>
-            <a href={site.github} className={buttonVariants({ variant: "signalOutline" })}>View on GitHub</a>
-          </div>
-        </div>
-      </section>
+      <CtaBand />
     </>
   );
 }

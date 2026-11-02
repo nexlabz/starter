@@ -11,4 +11,15 @@ export const site = {
   twitter: "@nexlabz",
   github: "https://github.com/nexlabz/starter",
   supportEmail: "hello@example.com",
+  nav: [
+    { href: "/features", label: "Features" },
+    { href: "/pricing", label: "Pricing" },
+    { href: "/changelog", label: "Changelog" },
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
+  ],
+  legal: [
+    { href: "/privacy", label: "Privacy" },
+    { href: "/terms", label: "Terms" },
+  ],
 } as const;
