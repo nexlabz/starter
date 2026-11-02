@@ -10,7 +10,7 @@ export const buttonVariants = cva(
         default: "border border-primary bg-primary text-primary-foreground",
         outline: "border border-input bg-transparent text-foreground",
         destructive: "border border-destructive bg-destructive text-destructive-foreground",
-        wash: "border border-white bg-white text-[#14201c]",
+        wash: "border border-white bg-white text-signal-foreground",
         washOutline: "border border-white/60 bg-transparent text-white",
         signal: "border border-signal-foreground bg-signal-foreground text-signal",
         signalOutline: "border border-signal-foreground bg-transparent text-signal-foreground",

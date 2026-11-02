@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import type { Feature } from "@/config/features";
 import { cn } from "@/lib/utils";
-
-export type Feature = { t: string; d: string; proof: string };
 
 /** One feature in focus at a time. Every panel stays in the HTML for crawlers. */
 export function FeatureTabs({ features }: { features: Feature[] }) {

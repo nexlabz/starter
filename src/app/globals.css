@@ -3,33 +3,46 @@
 /* Design tokens, using shadcn/ui names so `shadcn add` output works here.
    Rebrand here (and in src/config/site.ts). */
 :root {
-  --background: #e6eae8;
-  --foreground: #14201c;
-  --card: #f7f8f6;
+  /* Follows the system until someone picks a theme, see src/lib/theme.ts. */
+  color-scheme: light dark;
+  --background: light-dark(#e6e8ea, #0f1319);
+  --foreground: light-dark(#141a22, #e9edf2);
+  --card: light-dark(#f7f8f8, #171c24);
   --card-foreground: var(--foreground);
-  --popover: #fcfdfc;
+  --popover: light-dark(#fcfcfd, #1c222b);
   --popover-foreground: var(--foreground);
-  --primary: #14201c;
-  --primary-foreground: #f7f8f6;
-  --secondary: #dbe1de;
+  --primary: light-dark(#141a22, #e9edf2);
+  --primary-foreground: light-dark(#f7f8f8, #141a22);
+  --secondary: light-dark(#dadde1, #222934);
   --secondary-foreground: var(--foreground);
-  --muted: #dbe1de;
-  --muted-foreground: #55635e;
-  --accent: #dbe1de;
+  --muted: light-dark(#dadde1, #222934);
+  --muted-foreground: light-dark(#555e6b, #a0abb9);
+  --accent: light-dark(#dadde1, #222934);
   --accent-foreground: var(--foreground);
-  --destructive: #b3261e;
-  --destructive-foreground: #ffffff;
-  --border: #cfd7d3;
-  --input: #c3cdc8;
-  --ring: #2f6f5e;
+  --destructive: light-dark(#b3261e, #f2867d);
+  --destructive-foreground: light-dark(#ffffff, #141a22);
+  --border: light-dark(#cfd3d9, #2a323e);
+  --input: light-dark(#c2c7cf, #39434f);
+  --ring: light-dark(#3d6172, #b9c8da);
   /* The tray a sheet rests on, the field behind inputs, and the one accent. */
-  --tray: #d6ddda;
-  --field: #fcfdfc;
+  --tray: light-dark(#d6d9de, #090c10);
+  --field: light-dark(#fcfcfd, #12161d);
   --signal: #d6f45b;
-  --signal-foreground: #14201c;
-  --sheet-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 10px 24px -18px rgb(20 50 40 / 0.45);
+  --signal-foreground: #141a22;
+  --warning: light-dark(#8a5a00, #f0c36a);
+  --sheet-edge: light-dark(rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.05));
+  --sheet-drop: light-dark(rgb(20 30 45 / 0.45), transparent);
+  --sheet-shadow: 0 1px 0 var(--sheet-edge) inset, 0 10px 24px -18px var(--sheet-drop);
   /* Hero and auth panels. Same in both themes: text on it is always light. */
   --wash: radial-gradient(90% 120% at 100% 100%, #9dbb9f 0%, transparent 60%), linear-gradient(120deg, #223c47 0%, #3d6172 55%, #6f97a6 100%);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -56,33 +69,11 @@
   --color-field: var(--field);
   --color-signal: var(--signal);
   --color-signal-foreground: var(--signal-foreground);
+  --color-warning: var(--warning);
   --font-sans: var(--font-hanken);
   --font-mono: var(--font-geist-mono);
   --font-dot: var(--font-doto);
   --shadow-sheet: var(--sheet-shadow);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #101a17;
-    --foreground: #e8edea;
-    --card: #1a2622;
-    --popover: #1f2d28;
-    --primary: #e8edea;
-    --primary-foreground: #14201c;
-    --secondary: #24332e;
-    --muted: #24332e;
-    --muted-foreground: #9fafa9;
-    --accent: #24332e;
-    --destructive: #f2867d;
-    --destructive-foreground: #14201c;
-    --border: #2c3d37;
-    --input: #3a4d46;
-    --ring: #a9d6c5;
-    --tray: #0a120f;
-    --field: #14201c;
-    --sheet-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset;
-  }
 }
 
 body {

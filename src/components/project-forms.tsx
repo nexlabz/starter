@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { ConfirmButton } from "@/components/confirm-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createProject, deleteProject } from "@/app/(app)/projects/actions";
@@ -29,23 +30,21 @@ export function AddProjectForm() {
   );
 }
 
-export function DeleteProjectButton({ id }: { id: string }) {
+export function DeleteProjectButton({ id, name }: { id: string; name: string }) {
   const router = useRouter();
-  const [pending, start] = useTransition();
   return (
-    <Button
-      variant="outline"
-      pending={pending}
-      onClick={() =>
-        start(async () => {
-          const res = await attempt(() => deleteProject(id));
-          if (!res) return;
-          reportResult(res);
-          if (!res.ok) router.refresh();
-        })
-      }
-    >
-      Delete
-    </Button>
+    <ConfirmButton
+      label="Delete"
+      title={`Delete ${name}?`}
+      description="This removes the project for everyone in this workspace and can't be undone."
+      confirmLabel="Delete project"
+      onConfirm={async () => {
+        const res = await attempt(() => deleteProject(id));
+        if (!res) return false;
+        reportResult(res);
+        if (!res.ok) router.refresh();
+        return res.ok;
+      }}
+    />
   );
 }

@@ -1,21 +1,24 @@
 import type { Metadata } from "next";
 import { and, eq } from "drizzle-orm";
+import Link from "next/link";
 import { DotMeter } from "@/components/dot-meter";
+import { Notice } from "@/components/notice";
 import { PageHeader } from "@/components/page-header";
 import { listStyles } from "@/components/ui/card";
 import { db, schema } from "@/db";
 import { CancelInvitationButton, CopyInviteLinkButton, InviteForm, MemberRoleSelect, RemoveMemberButton } from "@/components/team-actions";
-import { getEntitlement } from "@/lib/billing/entitlements";
+import { getEntitlement, seatsTaken } from "@/lib/billing/entitlements";
 import { appUrl, emailEnabled } from "@/lib/env";
 import { isAdminRole, requireOrgSession } from "@/lib/session";
 import { isOwnerRole, memberControls } from "@/lib/team";
+import { usage } from "@/lib/usage";
 
 export const metadata: Metadata = { title: "Team" };
 
 export default async function TeamPage() {
   const s = await requireOrgSession();
   const admin = isAdminRole(s.role);
-  const [members, invites, ent] = await Promise.all([
+  const [members, invites, ent, taken] = await Promise.all([
     db
       .select({ id: schema.member.id, role: schema.member.role, userId: schema.user.id, name: schema.user.name, email: schema.user.email })
       .from(schema.member)
@@ -23,16 +26,19 @@ export default async function TeamPage() {
       .where(eq(schema.member.organizationId, s.orgId)),
     db.select().from(schema.invitation).where(and(eq(schema.invitation.organizationId, s.orgId), eq(schema.invitation.status, "pending"))),
     getEntitlement(db, s.orgId),
+    seatsTaken(db, s.orgId),
   ]);
+  const seats = usage(taken, ent.plan.limits.seats);
   const ownerCount = members.filter((m) => isOwnerRole(m.role)).length;
 
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        <PageHeader title="Team">{members.length} of {ent.plan.limits.seats} seats used on the {ent.plan.name} plan.</PageHeader>
-        <DotMeter used={members.length} limit={ent.plan.limits.seats} />
+        <PageHeader title="Team">{taken} of {ent.plan.limits.seats} seats used on the {ent.plan.name} plan, including open invitations.</PageHeader>
+        <DotMeter used={taken} limit={ent.plan.limits.seats} />
       </div>
-      {admin && <InviteForm emailOn={emailEnabled()} />}
+      {seats.state === "full" && <Notice tone="warning">Every seat is taken on the {ent.plan.name} plan. <Link href="/billing" className="underline underline-offset-4">Compare plans</Link> or remove a member to invite someone new.</Notice>}
+      {admin ? <InviteForm emailOn={emailEnabled()} /> : <Notice>Only owners and admins can invite people or change roles.</Notice>}
       <section aria-labelledby="members">
         <h2 id="members" className="mb-3 text-xl font-medium">Members</h2>
         <ul className={listStyles}>
