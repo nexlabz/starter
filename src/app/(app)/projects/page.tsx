@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { desc } from "drizzle-orm";
 import { AddProjectForm, DeleteProjectButton } from "@/components/project-forms";
+import { DotMeter } from "@/components/dot-meter";
+import { PageHeader } from "@/components/page-header";
+import { listStyles } from "@/components/ui/card";
 import { db, schema } from "@/db";
 import { withTenant } from "@/db/tenant";
 import { getEntitlement } from "@/lib/billing/entitlements";
@@ -15,18 +18,14 @@ export default async function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Projects</h1>
-        <p className="text-sm text-muted-foreground">
-          A sample tenant-owned resource. {rows.length} of {ent.plan.limits.projects} used on the {ent.plan.name} plan.
-        </p>
-      </div>
+      <PageHeader title="Projects">A sample tenant-owned resource. {rows.length} of {ent.plan.limits.projects} used on the {ent.plan.name} plan.</PageHeader>
+      <DotMeter used={rows.length} limit={ent.plan.limits.projects} />
       <AddProjectForm />
-      <ul className="divide-y divide-border rounded-xl border border-border">
-        {rows.length === 0 && <li className="p-4 text-sm text-muted-foreground">No projects yet.</li>}
+      <ul className={listStyles}>
+        {rows.length === 0 && <li className="p-5 text-muted-foreground">No projects yet. Name your first one above.</li>}
         {rows.map((p) => (
-          <li key={p.id} className="flex items-center justify-between p-4">
-            <span>{p.name}</span>
+          <li key={p.id} className="flex items-center justify-between gap-3 p-3 pl-5">
+            <span className="min-w-0 truncate">{p.name}</span>
             <DeleteProjectButton id={p.id} />
           </li>
         ))}

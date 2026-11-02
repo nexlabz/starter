@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AppNav } from "@/components/app-nav";
+import { Mark } from "@/components/mark";
 import { MobileNav } from "@/components/mobile-nav";
 import { OrgSwitcher } from "@/components/org-switcher";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -9,40 +11,29 @@ import { requireOrgSession } from "@/lib/session";
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-const nav = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/projects", label: "Projects" },
-  { href: "/team", label: "Team" },
-  { href: "/billing", label: "Billing" },
-  { href: "/settings", label: "Settings" },
-];
-
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const s = await requireOrgSession();
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="relative border-b border-border">
-        <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-3">
-          <Link href="/dashboard" className="font-bold">{site.name}</Link>
-          <div className="hidden md:block"><OrgSwitcher activeId={s.orgId} /></div>
-          <nav aria-label="App" className="ml-2 hidden gap-4 text-sm md:flex">
-            {nav.map((n) => (<Link key={n.href} href={n.href} className="text-muted-foreground hover:text-foreground">{n.label}</Link>))}
-          </nav>
-          <div className="ml-auto hidden items-center gap-3 text-sm text-muted-foreground md:flex">
-            <span>{s.user.email}</span>
-            <SignOutButton />
-          </div>
-          <MobileNav>
-            <OrgSwitcher activeId={s.orgId} />
-            <nav aria-label="App mobile" className="flex flex-col gap-1">
-              {nav.map((n) => (<Link key={n.href} href={n.href} className="py-2 text-muted-foreground hover:text-foreground">{n.label}</Link>))}
-            </nav>
-            <p className="truncate text-muted-foreground">{s.user.email}</p>
-            <SignOutButton />
-          </MobileNav>
+    <div className="flex min-h-screen flex-col md:flex-row">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-6 p-4 md:flex">
+        <Link href="/dashboard" className="inline-flex items-center gap-2 px-2 pt-2 font-semibold"><Mark />{site.name}</Link>
+        <OrgSwitcher activeId={s.orgId} />
+        <AppNav label="App" />
+        <div className="mt-auto space-y-3 px-2 text-sm text-muted-foreground">
+          <p className="truncate">{s.user.email}</p>
+          <SignOutButton />
         </div>
+      </aside>
+      <header className="relative flex items-center gap-4 px-5 py-3 md:hidden">
+        <Link href="/dashboard" className="inline-flex items-center gap-2 font-semibold"><Mark />{site.name}</Link>
+        <MobileNav>
+          <OrgSwitcher activeId={s.orgId} />
+          <AppNav label="App mobile" />
+          <p className="truncate text-muted-foreground">{s.user.email}</p>
+          <SignOutButton />
+        </MobileNav>
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-8">{children}</main>
+      <main className="w-full min-w-0 flex-1 px-5 py-6 md:py-10 md:pr-10 md:pl-6"><div className="mx-auto max-w-5xl">{children}</div></main>
     </div>
   );
 }

@@ -3,25 +3,33 @@
 /* Design tokens, using shadcn/ui names so `shadcn add` output works here.
    Rebrand here (and in src/config/site.ts). */
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --card: #f8fafc;
+  --background: #e6eae8;
+  --foreground: #14201c;
+  --card: #f7f8f6;
   --card-foreground: var(--foreground);
-  --popover: #ffffff;
+  --popover: #fcfdfc;
   --popover-foreground: var(--foreground);
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  --secondary: #f8fafc;
+  --primary: #14201c;
+  --primary-foreground: #f7f8f6;
+  --secondary: #dbe1de;
   --secondary-foreground: var(--foreground);
-  --muted: #f8fafc;
-  --muted-foreground: #64748b;
-  --accent: #f1f5f9;
+  --muted: #dbe1de;
+  --muted-foreground: #55635e;
+  --accent: #dbe1de;
   --accent-foreground: var(--foreground);
-  --destructive: #dc2626;
+  --destructive: #b3261e;
   --destructive-foreground: #ffffff;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #4f46e5;
+  --border: #cfd7d3;
+  --input: #c3cdc8;
+  --ring: #2f6f5e;
+  /* The tray a sheet rests on, the field behind inputs, and the one accent. */
+  --tray: #d6ddda;
+  --field: #fcfdfc;
+  --signal: #d6f45b;
+  --signal-foreground: #14201c;
+  --sheet-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 10px 24px -18px rgb(20 50 40 / 0.45);
+  /* Hero and auth panels. Same in both themes: text on it is always light. */
+  --wash: radial-gradient(90% 120% at 100% 100%, #9dbb9f 0%, transparent 60%), linear-gradient(120deg, #223c47 0%, #3d6172 55%, #6f97a6 100%);
 }
 
 @theme inline {
@@ -44,22 +52,36 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans);
+  --color-tray: var(--tray);
+  --color-field: var(--field);
+  --color-signal: var(--signal);
+  --color-signal-foreground: var(--signal-foreground);
+  --font-sans: var(--font-hanken);
   --font-mono: var(--font-geist-mono);
+  --font-dot: var(--font-doto);
+  --shadow-sheet: var(--sheet-shadow);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1020;
-    --foreground: #e5e7eb;
-    --card: #111827;
-    --popover: #111827;
-    --secondary: #111827;
-    --muted: #111827;
-    --muted-foreground: #94a3b8;
-    --accent: #1e293b;
-    --border: #1e293b;
-    --input: #1e293b;
+    --background: #101a17;
+    --foreground: #e8edea;
+    --card: #1a2622;
+    --popover: #1f2d28;
+    --primary: #e8edea;
+    --primary-foreground: #14201c;
+    --secondary: #24332e;
+    --muted: #24332e;
+    --muted-foreground: #9fafa9;
+    --accent: #24332e;
+    --destructive: #f2867d;
+    --destructive-foreground: #14201c;
+    --border: #2c3d37;
+    --input: #3a4d46;
+    --ring: #a9d6c5;
+    --tray: #0a120f;
+    --field: #14201c;
+    --sheet-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset;
   }
 }
 
@@ -67,4 +89,30 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@layer base {
+  h1, h2, h3 {
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+}
+
+/* Dot-matrix numerals. Display sizes only: Doto is unreadable small. */
+.dot-numeral {
+  font-family: var(--font-dot), var(--font-sans), monospace;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.bg-wash {
+  background: var(--wash);
+}
+
+@media (forced-colors: active) {
+  .bg-wash {
+    background: Canvas;
+    border: 1px solid CanvasText;
+  }
 }

@@ -10,7 +10,7 @@ export const SelectValue = SelectPrimitive.Value;
 export function SelectTrigger({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
   return (
     <SelectPrimitive.Trigger
-      className={cn("inline-flex cursor-pointer items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring", className)}
+      className={cn("inline-flex cursor-pointer items-center justify-between gap-2 rounded-xl border border-input bg-field px-3.5 py-2.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring", className)}
       {...props}
     >
       {children}
@@ -25,7 +25,7 @@ export function SelectContent({ className, children, ...props }: React.Component
       <SelectPrimitive.Content
         position="popper"
         sideOffset={4}
-        className={cn("z-50 min-w-(--radix-select-trigger-width) rounded-md border border-border bg-popover text-popover-foreground shadow-md", className)}
+        className={cn("z-50 min-w-(--radix-select-trigger-width) rounded-xl border border-border bg-popover text-popover-foreground shadow-md", className)}
         {...props}
       >
         <SelectPrimitive.Viewport className="p-1">{children}</SelectPrimitive.Viewport>
@@ -37,7 +37,7 @@ export function SelectContent({ className, children, ...props }: React.Component
 export function SelectItem({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Item>) {
   return (
     <SelectPrimitive.Item
-      className={cn("relative flex cursor-pointer items-center rounded-sm py-1.5 pr-8 pl-2 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground", className)}
+      className={cn("relative flex cursor-pointer items-center rounded-lg py-1.5 pr-8 pl-2 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground", className)}
       {...props}
     >
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

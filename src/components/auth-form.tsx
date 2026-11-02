@@ -37,8 +37,8 @@ export function AuthForm({ mode, google }: { mode: "sign-in" | "sign-up"; google
   }
 
   return (
-    <div className="mx-auto w-full max-w-sm px-6 py-16">
-      <h1 className="text-2xl font-bold">{mode === "sign-up" ? "Create your account" : "Welcome back"}</h1>
+    <div className="w-full">
+      <h1 className="text-4xl font-medium">{mode === "sign-up" ? "Create your account" : "Welcome back"}</h1>
       <form onSubmit={onSubmit} className="mt-6 space-y-4">
         {mode === "sign-up" && (
           <label className="block text-sm">Name<Input name="name" required className="mt-1" autoComplete="name" /></label>
