@@ -31,14 +31,14 @@ export function MobileNav({ children }: { children: React.ReactNode }) {
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen(!open)}
-        className="inline-flex size-10 cursor-pointer items-center justify-center rounded-md border border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        className="inline-flex size-10 cursor-pointer items-center justify-center rounded-full border border-input focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
         <Icon className="size-5" aria-hidden />
       </button>
       {open && (
         <div
           id={panelId}
-          className="absolute inset-x-0 top-full z-20 flex flex-col gap-3 border-b border-border bg-background px-6 py-4 text-sm shadow-sm"
+          className="absolute inset-x-2 top-full z-20 flex flex-col gap-3 rounded-[20px] border border-border bg-popover p-4 text-sm shadow-sheet"
           onClick={(e) => {
             if ((e.target as HTMLElement).closest("a")) setOpen(false);
           }}

@@ -27,7 +27,7 @@ export function OrgSwitcher({ activeId }: { activeId: string }) {
         });
       }}
     >
-      <SelectTrigger aria-label="Switch workspace"><SelectValue /></SelectTrigger>
+      <SelectTrigger aria-label="Switch workspace" className="w-full min-w-0 [&>span:first-child]:truncate"><SelectValue /></SelectTrigger>
       <SelectContent>
         {orgs.map((o) => (<SelectItem key={o.id} value={o.id}>{o.name}</SelectItem>))}
         <SelectItem value="__new"><span className="inline-flex items-center gap-1"><Plus className="size-4" aria-hidden />New workspace</span></SelectItem>

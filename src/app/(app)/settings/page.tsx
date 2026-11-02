@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { and, eq } from "drizzle-orm";
 import { DeleteAccountButton, DeleteWorkspaceButton, PasswordForm, ProfileForm, WorkspaceForm } from "@/components/settings-forms";
+import { PageHeader } from "@/components/page-header";
 import { Card } from "@/components/ui/card";
 import { db, schema } from "@/db";
 import { isAdminRole, requireOrgSession } from "@/lib/session";
@@ -22,25 +23,22 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-2xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-sm text-muted-foreground">Manage your account and this workspace.</p>
-      </div>
+      <PageHeader title="Settings">Manage your account and this workspace.</PageHeader>
       <section aria-labelledby="workspace" className="space-y-4">
-        <h2 id="workspace" className="font-semibold">Workspace</h2>
+        <h2 id="workspace" className="text-xl font-medium">Workspace</h2>
         <Card className="space-y-4">
           {isAdminRole(s.role) ? <WorkspaceForm name={org.name} /> : <p className="text-sm">{org.name}. Ask an owner or admin to change this.</p>}
         </Card>
       </section>
       <section aria-labelledby="account" className="space-y-4">
-        <h2 id="account" className="font-semibold">Account</h2>
+        <h2 id="account" className="text-xl font-medium">Account</h2>
         <Card className="space-y-4">
           <ProfileForm name={s.user.name} email={s.user.email} />
         </Card>
         {hasPassword && <Card className="space-y-4"><PasswordForm orgId={s.orgId} /></Card>}
       </section>
       <section aria-labelledby="danger" className="space-y-4">
-        <h2 id="danger" className="font-semibold text-destructive">Danger zone</h2>
+        <h2 id="danger" className="text-xl font-medium text-destructive">Danger zone</h2>
         <Card className="space-y-4">
           {isOwnerRole(s.role) && (
             <div className="flex flex-wrap items-center justify-between gap-3">
